@@ -1,102 +1,134 @@
-# Statistical Machine Learning Project
+# 📊 Statistical Machine Learning Project
 
-## Overview
-
-This project was developed as part of the **Statistical Machine Learning** course.
-
-The objective is to compare different Machine Learning techniques for both **supervised** and **unsupervised** learning using two real-world datasets in R.
-
-The project includes data preprocessing, exploratory analysis, model training, performance evaluation, and result interpretation.
+![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Supervised%20%26%20Unsupervised-orange?style=for-the-badge)
+![University](https://img.shields.io/badge/University%20of%20Milan-Course%20Project-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ---
 
-## Project Objectives
+## 📖 Overview
 
-### Supervised Learning
+This repository contains the final project developed for the **Statistical Machine Learning** course.
 
-- Predict individual income using the Adult Income dataset.
-- Compare the performance of two supervised classification algorithms.
-- Evaluate models using standard classification metrics.
+The project explores both **Supervised Learning** and **Unsupervised Learning** using two real-world datasets.
 
-### Unsupervised Learning
+The complete workflow includes:
 
-- Segment customers using the Online Retail dataset.
-- Compare two clustering algorithms.
-- Identify meaningful customer groups based on purchasing behavior.
-
----
-
-## Datasets
-
-### 1. Adult Income Dataset
-
-- Source: UCI Machine Learning Repository
-- Task: Binary Classification
-- Target Variable: Income (>50K / <=50K)
-
-### 2. Online Retail Dataset
-
-- Source: UCI Machine Learning Repository
-- Task: Customer Segmentation
+- Data preprocessing
+- Exploratory Data Analysis (EDA)
+- Feature engineering
+- Model training
+- Model comparison
+- Performance evaluation
+- Result interpretation
 
 ---
 
-## Algorithms
+# 🎯 Objectives
 
-### Supervised Learning
+## Supervised Learning
+
+Predict whether an individual's annual income exceeds **$50K** using demographic and employment-related variables.
+
+Algorithms compared:
 
 - Logistic Regression
 - Random Forest
 
-### Unsupervised Learning
+---
+
+## Unsupervised Learning
+
+Perform customer segmentation using purchasing behavior extracted from the **Online Retail** dataset.
+
+Algorithms compared:
 
 - K-Means Clustering
 - Hierarchical Clustering
 
 ---
 
-## Evaluation Metrics
+# 📂 Datasets
 
-### Classification
+## Adult Income Dataset
+
+- Source: UCI Machine Learning Repository
+- Type: Classification
+- Target: Income (>50K / ≤50K)
+
+---
+
+## Online Retail Dataset
+
+- Source: UCI Machine Learning Repository
+- Type: Customer Segmentation
+
+---
+
+# 🤖 Machine Learning Pipeline
+
+## Supervised Learning
+
+- Data Cleaning
+- Missing Value Handling
+- Feature Encoding
+- Train/Test Split
+- Logistic Regression
+- Random Forest
+- Model Evaluation
+
+### Evaluation Metrics
 
 - Accuracy
 - Precision
 - Recall
-- F1-Score
+- F1-score
 - ROC Curve
 - AUC
 - Confusion Matrix
 
-### Clustering
+---
+
+## Unsupervised Learning
+
+- Data Cleaning
+- Customer Feature Engineering (RFM-style variables)
+- Data Standardization
+- Optimal Number of Clusters
+- K-Means
+- Hierarchical Clustering
+
+### Evaluation Metrics
 
 - Elbow Method
-- Silhouette Score
+- Silhouette Analysis
 - Dendrogram
 - Cluster Visualization
 
 ---
 
-## Project Structure
+# 📁 Repository Structure
 
 ```
-Statistical-Machine-Learning-Project/
+Statistical-Machine-Learning-Project
 │
-├── code/
+├── code
 │   ├── supervised_learning.Rmd
 │   └── unsupervised_learning.Rmd
 │
-├── datasets/
+├── datasets
 │   ├── adult.csv
 │   └── OnlineRetail.xlsx
 │
-├── reports/
+├── reports
 │   ├── report_supervised.pdf
 │   └── report_unsupervised.pdf
 │
-├── presentation/
+├── presentation
 │   └── presentation statistical_learning.pdf
 │
-├── images/
+├── images
 │
 ├── README.md
 ├── LICENSE
@@ -105,61 +137,96 @@ Statistical-Machine-Learning-Project/
 
 ---
 
-## Technologies Used
+# 🛠 Technologies
 
 - R
+- RStudio
 - R Markdown
 - tidyverse
+- dplyr
+- ggplot2
 - caret
 - randomForest
 - cluster
 - factoextra
-- ggplot2
-- dplyr
 
 ---
 
-## Results
+# 📈 Results
 
-### Supervised Learning
+## Supervised Learning
 
-The comparison shows the strengths and weaknesses of the selected classification algorithms based on predictive performance and model evaluation metrics.
+The supervised analysis compares the predictive performance of Logistic Regression and Random Forest using multiple evaluation metrics.
 
-### Unsupervised Learning
+Performance was assessed using:
 
-Customer segmentation identifies groups with different purchasing behaviors and compares the quality of K-Means and Hierarchical Clustering.
-
----
-
-## Repository Contents
-
-- Source code in R Markdown
-- Datasets
-- Final reports
-- Presentation slides
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC Curve
+- AUC
+- Confusion Matrix
 
 ---
 
-## How to Run
+## Unsupervised Learning
 
-1. Download or clone this repository.
+The clustering analysis identifies customer groups with similar purchasing behaviors.
+
+The project compares K-Means and Hierarchical Clustering using:
+
+- Elbow Method
+- Silhouette Score
+- Dendrogram
+- Cluster Visualization
+
+---
+
+# 📄 Included Files
+
+- ✅ Complete R Markdown source code
+- ✅ Original datasets
+- ✅ Final reports (PDF)
+- ✅ Final presentation
+
+---
+
+# 🚀 How to Run
+
+Clone the repository
 
 ```bash
 git clone https://github.com/sami-hnaien/Statistical-Machine-Learning-Project.git
 ```
 
-2. Open the `.Rmd` files in **RStudio**.
+Open the project in **RStudio**.
 
-3. Install the required packages.
+Install the required packages if necessary.
 
-4. Run all code chunks to reproduce the analysis.
+Run all code chunks in the `.Rmd` files.
 
 ---
 
-## Author
+# 👨‍💻 Author
 
 **Sami Hnaien**
 
-Master's Student in Data Science for Economics and Health
+Master's Student
+
+**Data Science for Economics and Health**
 
 University of Milan
+
+---
+
+## ⭐ Project Highlights
+
+- Supervised Machine Learning
+- Unsupervised Machine Learning
+- Classification
+- Customer Segmentation
+- Statistical Learning
+- Data Visualization
+- Model Evaluation
+- R Programming

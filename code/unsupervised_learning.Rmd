@@ -1,0 +1,233 @@
+---
+title: "Unsupervised Learning Project: Customer Segmentation using Clustering"
+author: "Sami"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Introduction
+
+This appendix presents the R implementation used to preprocess the data, perform clustering, and analyze customer segments using unsupervised learning techniques.
+
+The objective of this project is to identify natural groupings of customers based on their purchasing behavior without using any predefined target variable.
+
+------------------------------------------------------------------------
+
+# 1. Load Required Packages
+
+The following packages are required for data manipulation, visualization, and clustering algorithms.
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(factoextra)
+library(cluster)
+library(readxl)
+
+```
+
+# 2. Data Loading and Exploration
+
+In this section, the dataset is loaded and explored to understand its structure and main characteristics.
+
+The dataset contains transactional data from an online retail store, including information about invoices, products, quantities, prices, and customers.
+
+Understanding the dataset is an important step before performing any preprocessing or clustering.
+
+```{r cars}
+
+setwd("C:/Users/SYB HP/Desktop/statistical_learn_project/unsupervised")
+
+data <- read_excel("OnlineRetail.xlsx")
+
+# Aperçu
+head(data)
+str(data)
+summary(data)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+# delete missing values
+data <- na.omit(data)
+
+# Remove canceled transactions (Invoice start with C)
+data <- data[!grepl("^C", data$InvoiceNo), ]
+
+# delete negative quantities
+data <- data[data$Quantity > 0, ]
+
+# Verification
+summary(data)
+```
+```{r}
+# ================================
+# BLOCK 4 — Feature Engineering
+# ================================
+
+# Create TotalPrice
+data$TotalPrice <- data$Quantity * data$UnitPrice
+
+#  date Conversion
+data$InvoiceDate <- as.POSIXct(data$InvoiceDate,
+                               format="%m/%d/%Y %H:%M")
+
+# Verification
+head(data)
+```
+
+```{r pressure, echo=FALSE}
+
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 5 — Customer Aggregation
+# ================================
+
+data_customer <- data %>%
+  group_by(CustomerID) %>%
+  summarise(
+    total_spent = sum(TotalPrice),
+    frequency = n(),
+    avg_spent = mean(TotalPrice)
+  )
+
+# Remove rows with missing CustomerID
+data_customer <- na.omit(data_customer)
+
+head(data_customer)
+```
+```{r}
+# ================================
+# EDA — Total Spending Distribution
+# ================================
+ggplot(data_customer,
+       aes(x = total_spent)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Distribution of Total Spending",
+       x = "Total Spending",
+       y = "Frequency")
+
+```
+
+
+```{r}
+
+# ================================
+# EDA — Purchase Frequency
+# ================================
+
+ggplot(data_customer,
+       aes(x = frequency)) +
+  geom_histogram(bins = 30) +
+  labs(title = "Purchase Frequency Distribution",
+       x = "Frequency",
+       y = "Count")
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 6 — Normalization
+# ================================
+
+data_scaled <- scale(data_customer[, -1])
+
+# Verification
+head(data_scaled)
+```
+
+```{r pressure, echo=FALSE}
+
+# ================================
+# BLOCK 7 — Elbow Method
+# ================================
+
+wss <- numeric(10)
+
+for (k in 1:10) {
+  kmeans_model <- kmeans(data_scaled, centers = k, nstart = 25)
+  wss[k] <- kmeans_model$tot.withinss
+}
+
+plot(1:10, wss, type="b",
+     xlab="Number of Clusters",
+     ylab="WSS",
+     main="Elbow Method")
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 8 — KMeans
+# ================================
+
+set.seed(123)
+
+kmeans_model <- kmeans(data_scaled, centers = 3, nstart = 25)
+
+# Ajouter cluster
+data_customer$cluster <- kmeans_model$cluster
+head(data_customer)
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 9 — KMeans Visualization
+# ================================
+
+ggplot(data_customer, aes(x=total_spent, y=frequency,
+                          color=factor(cluster))) +
+  geom_point() +
+  labs(title="KMeans Clustering",
+       color="Cluster")
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 10 — Hierarchical
+# ================================
+
+dist_matrix <- dist(data_scaled)
+
+hc_model <- hclust(dist_matrix, method="ward.D2")
+plot(hc_model, main="Dendrogram")
+rect.hclust(hc_model, k = 7, border = "red")
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 11 — Cut Tree
+# ================================
+
+hc_clusters <- cutree(hc_model, k=3)
+
+data_customer$hc_cluster <- hc_clusters
+
+head(data_customer)
+```
+
+```{r pressure, echo=FALSE}
+# ================================
+# BLOCK 12 — Visualization HC
+# ================================
+
+ggplot(data_customer,
+       aes(x=total_spent, y=frequency,
+           color=factor(hc_cluster))) +
+  geom_point() +
+  labs(title="Hierarchical Clustering",
+       color="Cluster")
+```
+
+```{r pressure, echo=FALSE}
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

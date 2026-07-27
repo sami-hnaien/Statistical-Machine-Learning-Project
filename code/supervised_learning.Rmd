@@ -1,0 +1,291 @@
+---
+title: 'Supervised Learning Project: KNN vs Logistic Regression'
+author: "Sami"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Introduction
+
+This appendix presents the R implementation used to preprocess the data, train the models, and evaluate their performance.
+
+------------------------------------------------------------------------
+
+# 1. Load Required Packages
+
+The following packages are required for KNN classification and ROC curve analysis.
+
+```{r}
+library(class)
+library(pROC)
+
+```
+
+# 2. Load and Inspect Dataset
+
+We load the dataset and assign column names for better readability.
+
+```{r cars}
+setwd("C:/Users/SYB HP/Desktop/statistical_learn_project/supervised")
+
+data <- read.csv("adult.csv", header = FALSE, strip.white = TRUE)
+
+colnames(data) <- c("age", "workclass", "fnlwgt", "education",
+                    "education.num", "marital.status", "occupation",
+                    "relationship", "race", "sex",
+                    "capital.gain", "capital.loss",
+                    "hours.per.week", "native.country", "income")
+
+head(data)
+str(data)
+```
+
+# 3. Data Preparation
+
+Only numerical variables are selected to simplify the analysis. The target variable is converted into binary format.
+
+```{r pressure, echo=FALSE}
+data <- data[, c("age", "education.num", "hours.per.week",
+                 "capital.gain", "capital.loss", "income")]
+
+data$income <- ifelse(data$income == ">50K", 1, 0)
+head(data)
+```
+```{r}
+# EDA Income distribution
+
+library(ggplot2)
+
+ggplot(data, aes(x = income, fill = income)) +
+  geom_bar() +
+  labs(title = "Income Distribution",
+       x = "Income Category",
+       y = "Count")
+```
+```{r}
+
+# EDA Correlation matrix
+
+library(corrplot)
+
+numeric_data <- data[, c("age",
+                         "education.num",
+                         "hours.per.week",
+                         "capital.gain",
+                         "capital.loss")]
+
+cor_matrix <- cor(numeric_data)
+
+corrplot(cor_matrix,
+         method = "color",
+         addCoef.col = "black")
+```
+
+# 4. Train-Test Split
+
+The dataset is split into training (70%) and testing (30%) sets.
+
+```{r}
+set.seed(123)
+index <- sample(1:nrow(data), 0.7*nrow(data))
+
+train <- data[index, ]
+test <- data[-index, ]
+```
+
+# 5. Data Normalization
+
+Min-max scaling is applied to ensure all variables are on the same scale. This step is crucial for KNN.
+
+```{r}
+set.seed(123)
+
+scale_data <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+train_scaled <- train
+test_scaled <- test
+
+train_scaled[,1:5] <- scale_data(train[,1:5])
+test_scaled[,1:5] <- scale_data(test[,1:5])
+```
+
+# 6. Logistic Regression Model
+
+We train a logistic regression model and compute prediction accuracy.
+
+```{r}
+set.seed(123)
+
+model_log <- glm(income ~ ., data=train, family=binomial)
+
+prob_log <- predict(model_log, test, type="response")
+
+pred_log <- ifelse(prob_log > 0.5, 1, 0)
+
+accuracy_log <- mean(pred_log == test$income)
+accuracy_log
+```
+
+# 7. KNN Model
+
+We apply the KNN algorithm using normalized data.
+
+```{r}
+set.seed(123)
+
+train_x <- train_scaled[,1:5]
+test_x <- test_scaled[,1:5]
+train_y <- train$income
+
+pred_knn <- knn(train_x, test_x, train_y, k=5)
+
+accuracy_knn <- mean(pred_knn == test$income)
+accuracy_knn
+```
+
+```{r}
+```
+
+# 8. Evaluation Metrics (Logistic Regression)
+
+We compute confusion matrix, precision, recall, and F1-score.
+
+```{r}
+set.seed(123)
+
+cm_log <- table(Predicted = pred_log, Actual = test$income)
+
+
+TN <- cm_log[1,1]
+FN <- cm_log[1,2]
+FP <- cm_log[2,1]
+TP <- cm_log[2,2]
+
+precision_log <- TP / (TP + FP)
+recall_log <- TP / (TP + FN)
+f1_log <- 2 * (precision_log * recall_log) / (precision_log + recall_log)
+"Confusion matrix Log:"
+print(cm_log)
+print(paste("Precision Logistic:", precision_log))
+print(paste("Recall Logistic:", recall_log))
+print(paste("F1 Logistic:", f1_log))
+
+```
+
+# 9. Evaluation Metrics (KNN)
+
+Same evaluation is performed for KNN.
+
+```{r}
+set.seed(123)
+
+cm_knn <- table(Predicted = pred_knn, Actual = test$income)
+
+TN <- cm_knn[1,1]
+FN <- cm_knn[1,2]
+FP <- cm_knn[2,1]
+TP <- cm_knn[2,2]
+
+precision_knn <- TP / (TP + FP)
+recall_knn <- TP / (TP + FN)
+f1_knn <- 2 * (precision_knn * recall_knn) / (precision_knn + recall_knn)
+
+"Confusion matrix knn:"
+cm_knn
+
+print(paste("Precision KNN:", precision_knn))
+print(paste("Recall KNN:", recall_knn))
+print(paste("F1 KNN:", f1_knn))
+```
+
+# 10. K Optimization
+
+We test different values of K to find the optimal configuration.
+
+```{r}
+set.seed(123)
+
+for (k in 1:10) {
+  pred <- knn(train_x, test_x, train_y, k=k)
+  print(paste("k =", k, "accuracy =", mean(pred == test$income)))
+
+}
+```
+
+# 11. Accuracy vs K Plot
+
+This plot shows how accuracy varies with K.
+
+```{r}
+set.seed(123)
+
+k_values <- 1:10
+acc <- c()
+
+for (k in k_values) {
+  pred <- knn(train_x, test_x, train_y, k=k)
+  acc <- c(acc, mean(pred == test$income))
+}
+
+plot(k_values, acc, type="b",
+     xlab="K value",
+     ylab="Accuracy",
+     main="KNN Accuracy vs K")
+
+best_k <- k_values[which.max(acc)]
+
+print(paste("Best k =", best_k))
+```
+
+# 12. ROC Curve and AUC
+
+We evaluate model performance using ROC curves and AUC.
+
+##Logistic Regression##
+
+```{r}
+set.seed(123)
+
+roc_log <- roc(test$income, prob_log)
+
+plot(roc_log, col="blue", main="ROC Curve Comparison")
+
+auc(roc_log)
+```
+
+KNN
+
+```{r}
+set.seed(123)
+
+
+# ROC Logistic (d'abord)
+roc_log <- roc(test$income, prob_log)
+plot(roc_log, col="blue", main="ROC Curve Comparison")
+
+# ROC KNN (ensuite)
+pred_knn_prob <- knn(train_x, test_x, train_y, k=best_k, prob=TRUE)
+
+prob_knn <- ifelse(pred_knn_prob == 1,
+                   attr(pred_knn_prob, "prob"),
+                   1 - attr(pred_knn_prob, "prob"))
+
+roc_knn <- roc(test$income, prob_knn)
+
+plot(roc_knn, col="red", add=TRUE)
+
+# AUC
+auc(roc_log)
+auc(roc_knn)
+
+# Legend
+legend("bottomright",
+       legend=c("Logistic", "KNN"),
+       col=c("blue", "red"),
+       lwd=2)
+```
